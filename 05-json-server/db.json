@@ -1,0 +1,51 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "first_name": "Sebastian",
+      "last_name": "Eschweiler",
+      "email": "sebastian@codingthesmartway.com"
+    },
+    {
+      "id": 2,
+      "first_name": "Steve",
+      "last_name": "Palmer",
+      "email": "steve@codingthesmartway.com"
+    },
+    {
+      "id": 3,
+      "first_name": "Ann",
+      "last_name": "Smith",
+      "email": "ann@codingthesmartway.com"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "alice",
+      "password": "123456"
+    },
+    {
+      "id": 2,
+      "username": "bob",
+      "password": "654321"
+    },
+    {
+      "id": 3,
+      "username": "pcode",
+      "password": "p@ssw0rd"
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "title": "Hello World",
+      "authorId": 1
+    },
+    {
+      "id": 2,
+      "title": "Goodbye World",
+      "authorId": 2
+    }
+  ]
+}
