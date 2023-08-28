@@ -25,12 +25,29 @@ function generateAccessToken(user) {
   return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: "1800s" });
 }
 
+function generateRefreshToken(user) {
+  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "86400s",
+  });
+}
+
 function verifyAccessToken(token) {
   try {
     return jwt.verify(token, process.env.TOKEN_SECRET);
   } catch (err) {
     return null;
   }
+}
+function verifyRefreshToken(token) {
+  try {
+    return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  } catch (err) {
+    return null;
+  }
+}
+
+function parseJwt(token) {
+  return JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
 }
 
 server.post("/api/register", (req, res) => {
@@ -82,7 +99,45 @@ server.post("/api/login", (req, res) => {
     id: data[0].id,
     username: data[0].username,
   });
-  res.json({ token });
+  const refreshToken = generateRefreshToken({
+    id: data[0].id,
+    username: data[0].username,
+  });
+  res.json({ token, refreshToken });
+});
+
+server.get("/api/refresh", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+  const verify = verifyRefreshToken(token);
+  if (!verify) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
+  let data = parseJwt(token);
+  const user = router.db
+    .get("users")
+    .filter((user) => {
+      return user.username === data.username;
+    })
+    .value();
+  if (user.length === 0) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const newToken = generateAccessToken({
+    id: user[0].id,
+    username: user[0].username,
+  });
+
+  const refreshToken = generateRefreshToken({
+    id: user[0].id,
+    username: user[0].username,
+  });
+  res.json({ newToken, refreshToken });
 });
 
 function autenticate(req, res, next) {
